@@ -2,11 +2,9 @@ fetch("data.csv")
   .then((res) => res.text())
   .then((csvText) => {
     // Split CSV into rows
-    const rows = csvText.trim().split("\n").map((r) => r.split(","));
+    const rows = csvText.trim().split("\n").map((r) => r.split(";"));
 
-    // Assuming first row is headers
-    const headers = rows[0];
-    const dataRows = rows.slice(1);
+    const dataRows = rows;
 
     // Convert columns to arrays
     const data = {
@@ -15,6 +13,8 @@ fetch("data.csv")
       ran: dataRows.map((r) => parseFloat(r[2])),
       cycled: dataRows.map((r) => parseFloat(r[3])),
     };
+
+    console.log(data);
 
     const ctx = document.getElementById("activityChart").getContext("2d");
     new Chart(ctx, {
