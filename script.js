@@ -2,13 +2,16 @@ fetch("data.csv")
   .then((res) => res.text())
   .then((csvText) => {
     // Split CSV into rows
-    const rows = csvText.trim().split("\n").map((r) => r.split(";"));
+    const rows = csvText
+      .trim()
+      .split("\n")
+      .map((r) => r.split(";"));
 
     const dataRows = rows;
 
     // Convert columns to arrays
     const data = {
-      labels: dataRows.map((r) => r[0]),       // first column = labels
+      labels: dataRows.map((r) => r[0]), // first column = labels
       walked: dataRows.map((r) => parseFloat(r[1])),
       ran: dataRows.map((r) => parseFloat(r[2])),
       cycled: dataRows.map((r) => parseFloat(r[3])),
@@ -53,23 +56,27 @@ fetch("data.csv")
 
     const totals = { walked: 0, ran: 0, cycled: 0 };
 
-    rows.forEach(r => {
+    rows.forEach((r) => {
       totals.walked += parseFloat(r[1]?.replace(",", ".") || 0);
       totals.ran += parseFloat(r[2]?.replace(",", ".") || 0);
       totals.cycled += parseFloat(r[3]?.replace(",", ".") || 0);
     });
 
-    const ctx_total = document.getElementById("activityChartTotal").getContext("2d");
+    const ctx_total = document
+      .getElementById("activityChartTotal")
+      .getContext("2d");
     new Chart(ctx_total, {
       type: "bar",
       data: {
         labels: ["Walked", "Ran", "Cycled"],
-        datasets: [{
-          label: "Total (km)",
-          data: [totals.walked, totals.ran, totals.cycled],
-          backgroundColor: ["#3B82F6", "#EF4444", "#10B981"]
-        }]
+        datasets: [
+          {
+            label: "Total (km)",
+            data: [totals.walked, totals.ran, totals.cycled],
+            backgroundColor: ["#3B82F6", "#EF4444", "#10B981"],
+          },
+        ],
       },
-      options: { responsive: true, scales: { y: { beginAtZero: true } } }
+      options: { responsive: true, scales: { y: { beginAtZero: true } } },
     });
   });
