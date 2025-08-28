@@ -11,7 +11,10 @@ fetch("data.csv")
 
     // Convert columns to arrays
     const data = {
-      labels: dataRows.map((r) => r[0]), // first column = labels
+      labels: dataRows.map((r) => {
+        const d = new Date(r[0]);
+        return d.toLocaleString("de-DE", { month: "short", year: "numeric" });
+      }), // first column = labels
       walked: dataRows.map((r) => parseFloat(r[1])),
       ran: dataRows.map((r) => parseFloat(r[2])),
       cycled: dataRows.map((r) => parseFloat(r[3])),
