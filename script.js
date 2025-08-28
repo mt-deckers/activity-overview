@@ -50,4 +50,26 @@ fetch("data.csv")
       },
       options: { responsive: true, scales: { y: { beginAtZero: true } } },
     });
+
+    const totals = { walked: 0, ran: 0, cycled: 0 };
+
+    rows.forEach(r => {
+      totals.walked += parseFloat(r[1]?.replace(",", ".") || 0);
+      totals.ran += parseFloat(r[2]?.replace(",", ".") || 0);
+      totals.cycled += parseFloat(r[3]?.replace(",", ".") || 0);
+    });
+
+    const ctx_total = document.getElementById("activityChartTotal").getContext("2d");
+    new Chart(ctx_total, {
+      type: "bar",
+      data: {
+        labels: ["Walked", "Ran", "Cycled"],
+        datasets: [{
+          label: "Total (km)",
+          data: [totals.walked, totals.ran, totals.cycled],
+          backgroundColor: ["#3B82F6", "#EF4444", "#10B981"]
+        }]
+      },
+      options: { responsive: true, scales: { y: { beginAtZero: true } } }
+    });
   });
