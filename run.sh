@@ -10,3 +10,6 @@ function create_and_append_dump() {
 echo -n "" > data.csv
 create_and_append_dump "A4:D15"
 create_and_append_dump "A17:D28"
+
+echo "starting local server"
+python -m http.server 54587
