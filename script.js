@@ -1,85 +1,34 @@
-fetch("data.csv")
-  .then((res) => res.text())
-  .then((csvText) => {
-    // Split CSV into rows
-    const rows = csvText
-      .trim()
-      .split("\n")
-      .map((r) => r.split(";"));
-
-    const dataRows = rows;
-
-    // Convert columns to arrays
-    const data = {
-      labels: dataRows.map((r) => {
-        const d = new Date(r[0]);
-        return d.toLocaleString("de-DE", { month: "short", year: "numeric" });
-      }), // first column = labels
-      walked: dataRows.map((r) => parseFloat(r[1])),
-      ran: dataRows.map((r) => parseFloat(r[2])),
-      cycled: dataRows.map((r) => parseFloat(r[3])),
+fetch("data.json")
+  .then(res => res.json())
+  .then(data => {
+    const createChart = (ctxId, type, datasets, labels = data.labels) => {
+      const ctx = document.getElementById(ctxId).getContext("2d");
+      new Chart(ctx, {
+        type,
+        data: { labels, datasets },
+        options: { responsive: true, scales: { y: { beginAtZero: true } } },
+      });
     };
 
-    console.log(data);
+    const months = Object.keys(data.monthly); // ["2025-01", "2025-02", ...]
+    const walked = months.map(m => data.monthly[m].walked || null);
+    const ran    = months.map(m => data.monthly[m].ran || null);
+    const cycled = months.map(m => data.monthly[m].cycled || null);
 
-    const ctx = document.getElementById("activityChart").getContext("2d");
-    new Chart(ctx, {
-      type: "line",
-      data: {
-        labels: data.labels,
-        datasets: [
-          {
-            label: "Walked (km)",
-            data: data.walked,
-            borderColor: "#3B82F6",
-            backgroundColor: "rgba(59, 130, 246, 0.1)",
-            fill: true,
-            tension: 0.3,
-          },
-          {
-            label: "Ran (km)",
-            data: data.ran,
-            borderColor: "#EF4444",
-            backgroundColor: "rgba(239, 68, 68, 0.1)",
-            fill: true,
-            tension: 0.3,
-          },
-          {
-            label: "Cycled (km)",
-            data: data.cycled,
-            borderColor: "#10B981",
-            backgroundColor: "rgba(16, 185, 129, 0.1)",
-            fill: true,
-            tension: 0.3,
-          },
-        ],
-      },
-      options: { responsive: true, scales: { y: { beginAtZero: true } } },
-    });
+    createChart("activityChart", "line", [
+      { label: "Walked (km)", data: walked, borderColor: "#3B82F6", backgroundColor: "rgba(59,130,246,0.1)", fill: true, tension: 0.3 },
+      { label: "Ran (km)", data: ran, borderColor: "#EF4444", backgroundColor: "rgba(239,68,68,0.1)", fill: true, tension: 0.3 },
+      { label: "Cycled (km)", data: cycled, borderColor: "#10B981", backgroundColor: "rgba(16,185,129,0.1)", fill: true, tension: 0.3 },
+    ], months); // labels = months
 
-    const totals = { walked: 0, ran: 0, cycled: 0 };
+    const years = Object.keys(data.yearly);
+    createChart("activityChartYearly", "bar", [
+      { label: "Walked (km)", data: years.map(y => data.yearly[y].walked), backgroundColor: "#3B82F6" },
+      { label: "Ran (km)", data: years.map(y => data.yearly[y].ran), backgroundColor: "#EF4444" },
+      { label: "Cycled (km)", data: years.map(y => data.yearly[y].cycled), backgroundColor: "#10B981" },
+    ], years);
 
-    rows.forEach((r) => {
-      totals.walked += parseFloat(r[1]?.replace(",", ".") || 0);
-      totals.ran += parseFloat(r[2]?.replace(",", ".") || 0);
-      totals.cycled += parseFloat(r[3]?.replace(",", ".") || 0);
-    });
-
-    const ctx_total = document
-      .getElementById("activityChartTotal")
-      .getContext("2d");
-    new Chart(ctx_total, {
-      type: "bar",
-      data: {
-        labels: ["Walked", "Ran", "Cycled"],
-        datasets: [
-          {
-            label: "Total (km)",
-            data: [totals.walked, totals.ran, totals.cycled],
-            backgroundColor: ["#3B82F6", "#EF4444", "#10B981"],
-          },
-        ],
-      },
-      options: { responsive: true, scales: { y: { beginAtZero: true } } },
-    });
+    createChart("activityChartTotal", "bar", [
+      { label: "Total (km)", data: [data.totals.walked, data.totals.ran, data.totals.cycled], backgroundColor: ["#3B82F6","#EF4444","#10B981"] },
+    ], ["Walked","Ran","Cycled"]);
   });
