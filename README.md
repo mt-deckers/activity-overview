@@ -6,6 +6,4 @@
 
 Just push.
 
-
 [live](https://mt-deckers.github.io/activity-overview/)
-
