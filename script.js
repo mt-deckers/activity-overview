@@ -71,20 +71,20 @@ fetch("data.json")
       years,
     );
 
-    (() => {
-      createChart(
-        "activityChartTotal",
-        "bar",
-        [
-          {
-            label: "Total (km)",
-            data: [data.totals.walked, data.totals.ran, data.totals.cycled],
-            backgroundColor: ["#3B82F6", "#EF4444", "#10B981"],
-          },
-        ],
-        ["Walked", "Ran", "Cycled"],
-      );
-    })/*()*/;
+    // (() => {
+    //   createChart(
+    //     "activityChartTotal",
+    //     "bar",
+    //     [
+    //       {
+    //         label: "Total (km)",
+    //         data: [data.totals.walked, data.totals.ran, data.totals.cycled],
+    //         backgroundColor: ["#3B82F6", "#EF4444", "#10B981"],
+    //       },
+    //     ],
+    //     ["Walked", "Ran", "Cycled"],
+    //   );
+    // })/*()*/;
 
     // ...
   });
