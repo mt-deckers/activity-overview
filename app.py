@@ -55,27 +55,56 @@ def aggregate_workouts(filename):
 
 
 def aggregate_body(filename):
+    import numpy as np
+
     # Detect delimiter
     with open(filename) as f:
-        first_line = f.readline()
+        first_line = f.readline().strip()
     sep = "\t" if "\t" in first_line else ","
 
-    df = pd.read_csv(filename, sep=sep)
+    # Try reading with header first; fallback to no header
+    try:
+        df = pd.read_csv(filename, sep=sep)
+        if not set(df.columns).intersection({"Date", "Weight", "Body Fat", "Body_Fat"}):
+            raise ValueError
+    except Exception:
+        df = pd.read_csv(filename, sep=sep, header=None,
+                         names=["Date", "Weight", "Body_Fat", "Body_age"])
+
+    # Normalize column names
     df.columns = df.columns.str.strip().str.replace(" ", "_")
 
-    # Clean numeric columns
-    df["Weight"] = df["Weight"].str.replace("kg", "", regex=False).astype(float)
-    df["Body_Fat"] = df["Body_Fat"].str.replace("%", "", regex=False).astype(float)
-    df["Body_age"] = df["Body_age"].astype(int)
+    # Clean numeric values
+    def clean(col, unit=None):
+        s = df[col].astype(str).replace("--", np.nan)
+        if unit:
+            s = s.str.replace(unit, "", regex=False)
+        return s.astype(float)
+
+    df["Weight"] = clean("Weight", "kg")
+    if "Body_Fat" in df.columns:
+        df["Body_Fat"] = clean("Body_Fat", "%")
+    else:
+        df["Body_Fat"] = np.nan
+    if "Body_age" in df.columns:
+        df["Body_age"] = clean("Body_age")
+    else:
+        df["Body_age"] = np.nan
 
     # Parse datetime
     df["Date"] = pd.to_datetime(df["Date"], format="%H:%M %b.%d %Y", errors="coerce")
     df = df.dropna(subset=["Date"])
 
+    # Daily averages (handle duplicates)
+    df["Day"] = df["Date"].dt.date
+    daily = df.groupby("Day")[["Weight", "Body_Fat", "Body_age"]].mean().reset_index()
+
+    # ✅ FIX: convert to datetime before to_period
+    daily["Month"] = pd.to_datetime(daily["Day"].astype(str)).dt.to_period("M")
+
     # Monthly averages
-    df["Month"] = df["Date"].dt.to_period("M")
     monthly_avg = (
-        df.groupby("Month")[["Weight", "Body_Fat", "Body_age"]]
+        daily.groupby("Month")[["Weight", "Body_Fat", "Body_age"]]
         .mean()
         .reset_index()
     )
@@ -90,21 +119,24 @@ def main():
     parser = argparse.ArgumentParser(description="Aggregate workout or body metric data.")
     subparsers = parser.add_subparsers(dest="command", required=True)
 
-    # workouts
-    p_work = subparsers.add_parser("workouts", help="Aggregate walked/ran/cycled data.")
-    p_work.add_argument("file", help="Input CSV with walked/ran/cycled columns.")
+    # workouts (ODS)
+    p_work = subparsers.add_parser("workouts", help="Aggregate walked/ran/cycled data from ODS.")
+    p_work.add_argument("file", help="Input ODS file with workout data.")
+    p_work.add_argument("--sheet", default="km", help="Sheet name to read (default: km).")
+    p_work.add_argument("--range", default=None, help="Cell range like A4:D15 (optional).")
 
-    # body
-    p_body = subparsers.add_parser("body", help="Aggregate body metric data.")
+    # body (CSV/TSV)
+    p_body = subparsers.add_parser("body", help="Aggregate body metric data from CSV/TSV.")
     p_body.add_argument("file", help="Input CSV/TSV with Date, Weight, Body Fat, Body age.")
 
     args = parser.parse_args()
 
     if args.command == "workouts":
-        aggregate_workouts(args.file)
+        from your_module import aggregate_workouts_ods  # import your function
+        result = aggregate_workouts_ods(args.file, sheet=args.sheet, cell_range=args.range)
+        print(json.dumps(result, indent=2))
     elif args.command == "body":
         aggregate_body(args.file)
-
 
 if __name__ == "__main__":
     main()
