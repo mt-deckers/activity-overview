@@ -6,59 +6,59 @@ from collections import defaultdict
 from datetime import datetime
 import pandas as pd
 
+import pandas as pd
+from collections import defaultdict
+import re
+
 def aggregate_workouts_ods(ods_file, sheet="km", cell_range=None):
     """
-    Aggregate walked/ran/cycled directly from an ODS file/sheet and optional range.
+    Aggregate walked/ran/cycled directly from an ODS file/sheet in the layout you provided,
+    with optional Excel-style cell range like 'A1:D28'.
     """
-    # Read the sheet
-    df = pd.read_excel(ods_file, sheet_name=sheet, engine="odf", header=None)
+    # Read entire sheet
+    df = pd.read_excel(ods_file, sheet_name=sheet, engine="odf", header=0)
 
-    # Optionally slice a range (A1:D10 style)
+    # Slice cell range if provided
     if cell_range:
-        # Convert Excel-style range to integer indices
-        import re
-        col_map = {chr(i+65): i for i in range(26)}
         m = re.match(r"([A-Z]+)(\d+):([A-Z]+)(\d+)", cell_range)
         if m:
             c1, r1, c2, r2 = m.groups()
+            col_map = {chr(i + 65): i for i in range(26)}  # A-Z -> 0-25
             df = df.iloc[int(r1)-1:int(r2), col_map[c1]:col_map[c2]+1]
 
-    # Expect columns: Date, Walked, Ran, Cycled
-    df.columns = ["Date", "Walked", "Ran", "Cycled"]
+    # Normalize column names
+    df.columns = df.columns.str.strip().str.replace(" ", "_")
 
     totals = {"walked": 0, "ran": 0, "cycled": 0}
-    yearly = defaultdict(lambda: {"walked": 0, "ran": 0, "cycled": 0})
     monthly = defaultdict(lambda: {"walked": 0, "ran": 0, "cycled": 0})
 
     for _, row in df.iterrows():
-        try:
-            dt = pd.to_datetime(row["Date"])
-        except Exception:
-            continue
-        def parse(x): return float(str(x).replace(",", ".") or 0)
-        walked, ran, cycled = parse(row["Walked"]), parse(row["Ran"]), parse(row["Cycled"])
+        month = str(row[df.columns[0]]).strip()
+        if not month or month.lower().startswith("sum") or month.lower().startswith("total"):
+            continue  # skip subtotal/total rows
+
+        def parse(x):
+            if pd.isna(x) or str(x).strip() == "":
+                return 0
+            return float(str(x).replace(",", "."))
+
+        walked = parse(row.get("Gehen", 0))
+        ran = parse(row.get("Laufen", 0))
+        cycled = parse(row.get("Rad", 0))
 
         totals["walked"] += walked
         totals["ran"] += ran
         totals["cycled"] += cycled
 
-        y = dt.year
-        yearly[y]["walked"] += walked
-        yearly[y]["ran"] += ran
-        yearly[y]["cycled"] += cycled
+        monthly[month]["walked"] += walked
+        monthly[month]["ran"] += ran
+        monthly[month]["cycled"] += cycled
 
-        ym = dt.strftime("%Y-%m")
-        monthly[ym]["walked"] += walked
-        monthly[ym]["ran"] += ran
-        monthly[ym]["cycled"] += cycled
-
-    output = {
+    return {
         "totals": totals,
-        "yearly": dict(yearly),
-        "monthly": dict(monthly),
+        "monthly": dict(monthly)
     }
 
-    return output  # in-memory, no file saved
 
 
 def aggregate_body(filename):
