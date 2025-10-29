@@ -152,7 +152,7 @@ def main():
     args = parser.parse_args()
 
     if args.command == "workouts":
-        out = "workouts_data.json"
+        out = "data_workouts.json"
         result = aggregate_workouts_ods(
             args.file, sheet=args.sheet, cell_range=args.range
         )
@@ -161,7 +161,7 @@ def main():
         print(f"✅ Workout metrics aggregated → {out}")
     elif args.command == "body":
         result = aggregate_body(args.file)
-        out = "body_data.json"
+        out = "data_body_metrics.json"
         result.to_json(out, orient="records", indent=2)
         print(f"✅ Body metrics aggregated → {out}")
 
