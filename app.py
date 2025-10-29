@@ -10,6 +10,7 @@ import pandas as pd
 from collections import defaultdict
 import re
 
+
 def aggregate_workouts_ods(ods_file, sheet="km", cell_range=None):
     """
     Aggregate walked/ran/cycled directly from an ODS file/sheet in the layout you provided,
@@ -24,7 +25,7 @@ def aggregate_workouts_ods(ods_file, sheet="km", cell_range=None):
         if m:
             c1, r1, c2, r2 = m.groups()
             col_map = {chr(i + 65): i for i in range(26)}  # A-Z -> 0-25
-            df = df.iloc[int(r1)-1:int(r2), col_map[c1]:col_map[c2]+1]
+            df = df.iloc[int(r1) - 1 : int(r2), col_map[c1] : col_map[c2] + 1]
 
     # Normalize column names
     df.columns = df.columns.str.strip().str.replace(" ", "_")
@@ -34,7 +35,11 @@ def aggregate_workouts_ods(ods_file, sheet="km", cell_range=None):
 
     for _, row in df.iterrows():
         month = str(row[df.columns[0]]).strip()
-        if not month or month.lower().startswith("sum") or month.lower().startswith("total"):
+        if (
+            not month
+            or month.lower().startswith("sum")
+            or month.lower().startswith("total")
+        ):
             continue  # skip subtotal/total rows
 
         def parse(x):
@@ -54,11 +59,7 @@ def aggregate_workouts_ods(ods_file, sheet="km", cell_range=None):
         monthly[month]["ran"] += ran
         monthly[month]["cycled"] += cycled
 
-    return {
-        "totals": totals,
-        "monthly": dict(monthly)
-    }
-
+    return {"totals": totals, "monthly": dict(monthly)}
 
 
 def aggregate_body(filename):
@@ -75,8 +76,12 @@ def aggregate_body(filename):
         if not set(df.columns).intersection({"Date", "Weight", "Body Fat", "Body_Fat"}):
             raise ValueError
     except Exception:
-        df = pd.read_csv(filename, sep=sep, header=None,
-                         names=["Date", "Weight", "Body_Fat", "Body_age"])
+        df = pd.read_csv(
+            filename,
+            sep=sep,
+            header=None,
+            names=["Date", "Weight", "Body_Fat", "Body_age"],
+        )
 
     # Normalize column names
     df.columns = df.columns.str.strip().str.replace(" ", "_")
@@ -111,38 +116,55 @@ def aggregate_body(filename):
 
     # Monthly averages
     monthly_avg = (
-        daily.groupby("Month")[["Weight", "Body_Fat", "Body_age"]]
-        .mean()
-        .reset_index()
+        daily.groupby("Month")[["Weight", "Body_Fat", "Body_age"]].mean().reset_index()
     )
     monthly_avg["Month"] = monthly_avg["Month"].astype(str)
 
-    out = "body_data.json"
-    monthly_avg.to_json(out, orient="records", indent=2)
-    print(f"✅ Body metrics aggregated → {out}")
+    return monthly_avg
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Aggregate workout or body metric data.")
+    parser = argparse.ArgumentParser(
+        description="Aggregate workout or body metric data."
+    )
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     # workouts (ODS)
-    p_work = subparsers.add_parser("workouts", help="Aggregate walked/ran/cycled data from ODS.")
+    p_work = subparsers.add_parser(
+        "workouts", help="Aggregate walked/ran/cycled data from ODS."
+    )
     p_work.add_argument("file", help="Input ODS file with workout data.")
-    p_work.add_argument("--sheet", default="km", help="Sheet name to read (default: km).")
-    p_work.add_argument("--range", default=None, help="Cell range like A4:D15 (optional).")
+    p_work.add_argument(
+        "--sheet", default="km", help="Sheet name to read (default: km)."
+    )
+    p_work.add_argument(
+        "--range", default=None, help="Cell range like A4:D15 (optional)."
+    )
 
     # body (CSV/TSV)
-    p_body = subparsers.add_parser("body", help="Aggregate body metric data from CSV/TSV.")
-    p_body.add_argument("file", help="Input CSV/TSV with Date, Weight, Body Fat, Body age.")
+    p_body = subparsers.add_parser(
+        "body", help="Aggregate body metric data from CSV/TSV."
+    )
+    p_body.add_argument(
+        "file", help="Input CSV/TSV with Date, Weight, Body Fat, Body age."
+    )
 
     args = parser.parse_args()
 
     if args.command == "workouts":
-        result = aggregate_workouts_ods(args.file, sheet=args.sheet, cell_range=args.range)
-        print(json.dumps(result, indent=2))
+        out = "workouts_data.json"
+        result = aggregate_workouts_ods(
+            args.file, sheet=args.sheet, cell_range=args.range
+        )
+        with open(out, "w", encoding="utf-8") as f:
+            json.dump(result, f, indent=2)
+        print(f"✅ Workout metrics aggregated → {out}")
     elif args.command == "body":
-        aggregate_body(args.file)
+        result = aggregate_body(args.file)
+        out = "body_data.json"
+        result.to_json(out, orient="records", indent=2)
+        print(f"✅ Body metrics aggregated → {out}")
+
 
 if __name__ == "__main__":
     main()

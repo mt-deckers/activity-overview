@@ -4,7 +4,6 @@ cd "$(dirname "$0")" && echo "📁 Changed dir to $(pwd)" || {
 	exit 1
 }
 
-
 echo "parsing and precompiling data"
 ./app.py workouts /opt/bin/data/workout/reps.ods
 
