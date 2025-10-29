@@ -6,7 +6,7 @@ cd "$(dirname "$0")" && echo "📁 Changed dir to $(pwd)" || {
 
 
 echo "parsing and precompiling data"
-./app.py workout fitdays.csv
+./app.py workouts /opt/bin/data/workout/reps.ods
 
 echo "body data"
 ./app.py body fitdays.csv

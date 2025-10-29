@@ -6,26 +6,37 @@ from collections import defaultdict
 from datetime import datetime
 import pandas as pd
 
-def aggregate_workouts(filename):
+def aggregate_workouts_ods(ods_file, sheet="km", cell_range=None):
+    """
+    Aggregate walked/ran/cycled directly from an ODS file/sheet and optional range.
+    """
+    # Read the sheet
+    df = pd.read_excel(ods_file, sheet_name=sheet, engine="odf", header=None)
+
+    # Optionally slice a range (A1:D10 style)
+    if cell_range:
+        # Convert Excel-style range to integer indices
+        import re
+        col_map = {chr(i+65): i for i in range(26)}
+        m = re.match(r"([A-Z]+)(\d+):([A-Z]+)(\d+)", cell_range)
+        if m:
+            c1, r1, c2, r2 = m.groups()
+            df = df.iloc[int(r1)-1:int(r2), col_map[c1]:col_map[c2]+1]
+
+    # Expect columns: Date, Walked, Ran, Cycled
+    df.columns = ["Date", "Walked", "Ran", "Cycled"]
+
     totals = {"walked": 0, "ran": 0, "cycled": 0}
     yearly = defaultdict(lambda: {"walked": 0, "ran": 0, "cycled": 0})
     monthly = defaultdict(lambda: {"walked": 0, "ran": 0, "cycled": 0})
 
-    with open(filename, newline="", encoding="utf-8") as f:
-        reader = csv.reader(f, delimiter=";")
-        rows = list(reader)
-
-    for r in rows:
-        if not r or len(r) < 4:
-            continue
+    for _, row in df.iterrows():
         try:
-            dt = datetime.strptime(r[0], "%Y-%m-%d")
-        except ValueError:
+            dt = pd.to_datetime(row["Date"])
+        except Exception:
             continue
-
-        def parse_num(x): return float(x.replace(",", ".") or 0)
-
-        walked, ran, cycled = parse_num(r[1]), parse_num(r[2]), parse_num(r[3])
+        def parse(x): return float(str(x).replace(",", ".") or 0)
+        walked, ran, cycled = parse(row["Walked"]), parse(row["Ran"]), parse(row["Cycled"])
 
         totals["walked"] += walked
         totals["ran"] += ran
@@ -47,11 +58,7 @@ def aggregate_workouts(filename):
         "monthly": dict(monthly),
     }
 
-    out = "workout_data.json"
-    with open(out, "w", encoding="utf-8") as f:
-        json.dump(output, f, indent=2)
-
-    print(f"✅ Workout data aggregated → {out}")
+    return output  # in-memory, no file saved
 
 
 def aggregate_body(filename):
@@ -132,7 +139,6 @@ def main():
     args = parser.parse_args()
 
     if args.command == "workouts":
-        from your_module import aggregate_workouts_ods  # import your function
         result = aggregate_workouts_ods(args.file, sheet=args.sheet, cell_range=args.range)
         print(json.dumps(result, indent=2))
     elif args.command == "body":
