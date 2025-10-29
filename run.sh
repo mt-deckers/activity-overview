@@ -8,7 +8,7 @@ echo "parsing and precompiling data"
 ./app.py workouts /opt/bin/data/workout/reps.ods
 
 echo "body data"
-./app.py body fitdays.csv
+./app.py body "$(ls  $WIN_DOWNLOADS/Fitdays*)"
 
 #echo "starting local server"
 #python -m http.server 54587
