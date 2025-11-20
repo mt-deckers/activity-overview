@@ -5,7 +5,10 @@ cd "$(dirname "$0")" && echo "📁 Changed dir to $(pwd)" || {
 }
 
 function create_and_append_dump() {
-	ods_export /opt/bin/data/workout/reps.ods --sheet=km --range=$1 --no-header --output="data_dump.csv"
+	cd /opt/bin/sub_projects/ods_export
+	pwd
+	cp /opt/bin/data/workout/reps.ods /opt/bin/sub_projects/ods_export/app
+	./run.sh app/reps.ods --sheet=km --range=$1 --no-header --output="data_dump.csv"
 	cat data_dump.csv >>data.csv
 	rm data_dump.csv
 }
