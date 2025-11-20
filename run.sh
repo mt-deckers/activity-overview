@@ -10,7 +10,7 @@ function create_and_append_dump() {
 	cp /opt/bin/data/workout/reps.ods /opt/bin/sub_projects/ods_export/app
 	./run.sh app/reps.ods --sheet=km --range=$1 --no-header --output="data_dump.csv"
 	cat data_dump.csv >>data.csv
-	rm data_dump.csv
+	sudo rm data_dump.csv
 }
 
 echo -n "" >data.csv
@@ -75,5 +75,8 @@ with open("data.json", "w", encoding="utf-8") as f:
     json.dump(output, f, indent=2)
 END
 
+echo "now cp the data back (wtf is this???)"
+cp ./data.json /opt/bin/sub_projects/activity_overview/
+
 echo "starting local server"
-python -m http.server 54587
+python3 -m http.server 54587
