@@ -1,4 +1,4 @@
-fetch("data.json")
+fetch("output/data.json")
   .then((res) => res.json())
   .then((data) => {
     const createChart = (ctxId, type, datasets, labels = data.labels) => {

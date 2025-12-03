@@ -11,3 +11,9 @@ docker run --rm \
   --sheet 2025 --range A1:D12 \
   --sheet 2024 --range A1:D12 \
   --sheet 2023 --range A1:D1
+
+if [ $? -eq 0 ]; then
+  echo "SUCCESS!!!!"
+  echo "start local server via:"
+  echo 'python3 -m http.server 54587'
+fi
