@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#docker build -t workout-extractor .
+docker build -t workout-extractor .
 
 docker run --rm \
   -v /opt/bin/data/workout/reps.ods:/input/reps.ods \
