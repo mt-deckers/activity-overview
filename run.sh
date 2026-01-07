@@ -3,7 +3,7 @@
 docker build -t workout-extractor .
 
 docker run --rm \
-  -v /opt/bin/data/workout/reps.ods:/input/reps.ods \
+  -v /opt/bin/data_archive/data/workout/reps.ods:/input/reps.ods \
   -v $(pwd)/output:/output \
   workout-extractor \
   --sheet 2023 --range A1:D1 \
