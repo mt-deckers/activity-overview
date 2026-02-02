@@ -9,6 +9,7 @@ docker run --rm \
   --sheet 2023 --range A1:D1 \
   --sheet 2024 --range A1:D12 \
   --sheet 2025 --range A1:D12 \
+  --sheet 2026 --range A1:D12 \
   --file /input/reps.ods \
   --out /output/data.json
 
