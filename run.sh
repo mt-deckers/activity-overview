@@ -14,7 +14,19 @@ docker run --rm \
   --out /output/data.json
 
 if [ $? -eq 0 ]; then
-  echo "SUCCESS!!!!"
-  echo "start local server via:"
-  echo 'python3 -m http.server 54587'
+cat << EOF
+SUCCESS!!!!
+start local server via:
+python3 -m http.server 54587
+
+Watch the project here:
+https://github.com/mt-deckers/activity-overview
+
+Check the deployments here:
+https://github.com/mt-deckers/activity-overview/deployments
+
+See the latest deployment here:
+https://mt-deckers.github.io/activity-overview/
+EOF
+
 fi
