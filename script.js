@@ -29,7 +29,7 @@ fetch("data.json")
 //        }),
       };
 
-    console.log(monthly['walked'], years, yearly["walked"]);
+    console.log(monthly['walked'])
 
     /*
     createChart(
