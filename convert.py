@@ -9,10 +9,13 @@ with open("data/data.yml") as f:
 # build years
 # labels
 data = {
-    "years": 123,
+    "years": set([
+        key.split("-")[0] if "-" in key else None for key, value in yml_data.items()
+    ]),
 }
 
 print(yml_data)
+print(data)
 
 with open("data.json", "w") as f:
     json.dump(data, f, indent=2)
