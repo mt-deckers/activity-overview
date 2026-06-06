@@ -42,45 +42,27 @@ fetch("data.json")
       data['months'],
     ); // labels => months; values => monthly["type"]
 
-    /*
     createChart(
       "activityChartYearly",
       "bar",
       [
         {
           label: "Walked (km)",
-          data: years.map((y) => data.yearly[y].walked),
+          data: data['yearly']['walked'],
           backgroundColor: "#3B82F6",
         },
         {
           label: "Ran (km)",
-          data: years.map((y) => data.yearly[y].ran),
+          data: data['yearly']['ran'],
           backgroundColor: "#EF4444",
         },
         {
           label: "Cycled (km)",
-          data: years.map((y) => data.yearly[y].cycled),
+          data: data['yearly']['cycled'],
           backgroundColor: "#10B981",
         },
       ],
-      years,
+      data['years'],
     );
-*/
 
-    // (() => {
-    //   createChart(
-    //     "activityChartTotal",
-    //     "bar",
-    //     [
-    //       {
-    //         label: "Total (km)",
-    //         data: [data.totals.walked, data.totals.ran, data.totals.cycled],
-    //         backgroundColor: ["#3B82F6", "#EF4444", "#10B981"],
-    //       },
-    //     ],
-    //     ["Walked", "Ran", "Cycled"],
-    //   );
-    // })/*()*/;
-
-    // ...
   });
