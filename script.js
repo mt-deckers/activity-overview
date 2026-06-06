@@ -10,35 +10,13 @@ fetch("data.json")
       });
     };
 
-    // years instanceof Set; so we cast it back using the spread operator
-    const months = Object.keys(data), // ["2025-01", "2025-02", ...]
-      monthly = {
-        walked: Object.fromEntries(months.map((month) => [month, data[month].walked || null])),
-        ran: months.map((month) => data[month].ran || null),
-        cycled: months.map((month) => data[month].cycled || null),
-      },
-      yearsSet = new Set(
-        months.map((month) =>
-          month.includes("-") ? month.split("-")[0] : null,
-        ),
-      ),
-      years = [...yearsSet],
-      yearly = {
-//        walked: monthly["walked"].map((entry) => {
-//          return 69;
-//        }),
-      };
-
-    console.log(monthly['walked'])
-
-    /*
     createChart(
       "activityChart",
       "line",
       [
         {
           label: "Walked (km)",
-          data: walked,
+          data: data['monthly']['walked'],
           borderColor: "#3B82F6",
           backgroundColor: "rgba(59,130,246,0.1)",
           fill: true,
@@ -46,7 +24,7 @@ fetch("data.json")
         },
         {
           label: "Ran (km)",
-          data: ran,
+          data: data['monthly']['ran'],
           borderColor: "#EF4444",
           backgroundColor: "rgba(239,68,68,0.1)",
           fill: true,
@@ -54,16 +32,15 @@ fetch("data.json")
         },
         {
           label: "Cycled (km)",
-          data: cycled,
+          data: data['monthly']['cycled'],
           borderColor: "#10B981",
           backgroundColor: "rgba(16,185,129,0.1)",
           fill: true,
           tension: 0.3,
         },
       ],
-      months,
-    ); // labels = months
-*/
+      data['months'],
+    ); // labels => months; values => monthly["type"]
 
     /*
     createChart(

@@ -14,6 +14,7 @@
 #  --out /output/data.json
 
 cat << EOF
+-----------------------------------------------------
 start local server via:
 python3 -m http.server 54587
 
@@ -25,4 +26,7 @@ https://github.com/mt-deckers/activity-overview/deployments
 
 See the latest deployment here:
 https://mt-deckers.github.io/activity-overview/
+-----------------------------------------------------
 EOF
+
+docker run --rm -v $(pwd):/data python:3.12-slim sh -c "pip install pyyaml -q --root-user-action=ignore --disable-pip-version-check && python /data/convert.py"
