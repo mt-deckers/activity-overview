@@ -19,9 +19,9 @@ data = {
     ),
     "months": sorted(yml_data.keys()),
     "monthly": {
-        "walked": [value["walked"] for key, value in yml_data.items()],
-        "ran": [value["ran"] for key, value in yml_data.items()],
-        "cycled": [value["cycled"] for key, value in yml_data.items()]
+        "walked": [value["walked"] or None for key, value in yml_data.items()],
+        "ran": [value["ran"] or None for key, value in yml_data.items()],
+        "cycled": [value["cycled"] or None for key, value in yml_data.items()]
     },
 }
 
