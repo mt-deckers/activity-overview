@@ -1,4 +1,4 @@
-fetch("output/data.json")
+fetch("data.json")
   .then((res) => res.json())
   .then((data) => {
     const createChart = (ctxId, type, datasets, labels = data.labels) => {
@@ -10,11 +10,28 @@ fetch("output/data.json")
       });
     };
 
-    const months = Object.keys(data.monthly); // ["2025-01", "2025-02", ...]
-    const walked = months.map((m) => data.monthly[m].walked || null);
-    const ran = months.map((m) => data.monthly[m].ran || null);
-    const cycled = months.map((m) => data.monthly[m].cycled || null);
+    // years instanceof Set; so we cast it back using the spread operator
+    const months = Object.keys(data), // ["2025-01", "2025-02", ...]
+      monthly = {
+        walked: Object.fromEntries(months.map((month) => [month, data[month].walked || null])),
+        ran: months.map((month) => data[month].ran || null),
+        cycled: months.map((month) => data[month].cycled || null),
+      },
+      yearsSet = new Set(
+        months.map((month) =>
+          month.includes("-") ? month.split("-")[0] : null,
+        ),
+      ),
+      years = [...yearsSet],
+      yearly = {
+//        walked: monthly["walked"].map((entry) => {
+//          return 69;
+//        }),
+      };
 
+    console.log(monthly['walked'], years, yearly["walked"]);
+
+    /*
     createChart(
       "activityChart",
       "line",
@@ -46,8 +63,9 @@ fetch("output/data.json")
       ],
       months,
     ); // labels = months
+*/
 
-    const years = Object.keys(data.yearly);
+    /*
     createChart(
       "activityChartYearly",
       "bar",
@@ -70,6 +88,7 @@ fetch("output/data.json")
       ],
       years,
     );
+*/
 
     // (() => {
     //   createChart(
