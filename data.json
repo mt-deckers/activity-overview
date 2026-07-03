@@ -155,6 +155,45 @@
       null,
       null,
       null
+    ],
+    "swam": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      12.96,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
     ]
   },
   "years": [
@@ -181,6 +220,12 @@
       "2024": 810.2800000000001,
       "2025": 2299.35,
       "2026": 673.3199999999999
+    },
+    "swam": {
+      "2023": 0,
+      "2024": 0,
+      "2025": 0,
+      "2026": 12.96
     }
   }
 }

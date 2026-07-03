@@ -38,6 +38,14 @@ fetch("data.json")
           fill: true,
           tension: 0.3,
         },
+        {
+          label: "Swam (km)",
+          data: data['monthly']['swam'],
+          borderColor: "#F59E0B",
+          backgroundColor: "rgba(245,158,11,0.1)",
+          fill: true,
+          tension: 0.3,
+        },
       ],
       data['months'],
     ); // labels => months; values => monthly["type"]
@@ -60,6 +68,11 @@ fetch("data.json")
           label: "Cycled (km)",
           data: data['yearly']['cycled'],
           backgroundColor: "#10B981",
+        },
+        {
+          label: "Swam (km)",
+          data: data['yearly']['swam'],
+          backgroundColor: "#F59E0B",
         },
       ],
       data['years'],

@@ -3,6 +3,21 @@
 import yaml
 import json
 
+SWIM_PACE_PER_100M = "3:10"  # min:sec per 100m
+
+
+def _pace_to_seconds(pace):
+    minutes, seconds = pace.split(":")
+    return int(minutes) * 60 + int(seconds)
+
+
+def swim_hours_to_km(hours, pace=SWIM_PACE_PER_100M):
+    if not hours:
+        return 0
+    pace_seconds = _pace_to_seconds(pace)
+    return hours * 3600 / pace_seconds * 100 / 1000
+
+
 with open("data.yml") as f:
     yml_data = yaml.safe_load(f)
 
@@ -14,6 +29,7 @@ data = {
         "walked": [value["walked"] or None for key, value in yml_data.items()],
         "ran": [value["ran"] or None for key, value in yml_data.items()],
         "cycled": [value["cycled"] or None for key, value in yml_data.items()],
+        "swam": [swim_hours_to_km(value.get("swam")) or None for key, value in yml_data.items()],
     },
     "years": sorted(
         set(
@@ -27,6 +43,7 @@ data = {
         "walked": {},
         "ran": {},
         "cycled": {},
+        "swam": {},
     },
 }
 
@@ -34,13 +51,17 @@ data = {
 for key, value in yml_data.items():
     if "-" in key:
         year_key = key.split("-")[0]
-        for activity in ['walked', 'ran', 'cycled']:
+        for activity in ['walked', 'ran', 'cycled', 'swam']:
             # pre-fill
             if year_key not in data['yearly'][activity]:
                 data['yearly'][activity][year_key] = 0
 
             # increment data
-            data['yearly'][activity][year_key] += value[activity] or 0
+            if activity == 'swam':
+                amount = swim_hours_to_km(value.get('swam'))
+            else:
+                amount = value[activity] or 0
+            data['yearly'][activity][year_key] += amount
 
 print(yml_data)
 print("===")
