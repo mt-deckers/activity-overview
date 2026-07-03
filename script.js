@@ -1,7 +1,7 @@
 const YEARLY_GOALS = [
   { year: "2024", text: "walk + run 1000km in total", progress: { activity: ["walked", "ran"], target: 1000 } },
   { year: "2025", text: "walk 1000km", progress: { activity: "walked", target: 1000 } },
-  { year: "2026", text: "run 667 km", progress: { activity: "ran", target: 667 } },
+  { year: "2026", text: "run 667km", progress: { activity: "ran", target: 667 } },
 ];
 
 // Chart.js has no built-in way to draw a label inside a bar, so draw it manually
