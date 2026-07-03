@@ -1,2 +1,29 @@
-*.csv
-*.json
+.idea
+
+# cache files and dirs
+__pycache__
+.pytest_cache
+.ruff_cache
+
+# data files
+*.ics
+*.txt
+*.log
+
+# media files
+*.png
+*.jpg
+*.jpeg
+
+# documents
+*.pdf
+*.azw3
+*.epub
+*.djvu
+
+# binaries
+*.zip
+*.tar
+
+# repository specfic
+# workspace/*.md
