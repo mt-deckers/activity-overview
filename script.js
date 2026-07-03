@@ -43,7 +43,7 @@ fetch("data.json")
             <span class="${done ? "text-green-500" : "text-gray-400"} mr-2">${done ? "✔" : "○"}</span>
             <span>${goal.year} &middot; ${goal.text}</span>
           </div>
-          ${done ? "" : `<canvas id="goalProgress-${i}" height="40" class="mt-2"></canvas>`}
+          ${done ? "" : `<canvas id="goalProgress-${i}" height="10" class="mt-2"></canvas>`}
         `;
         list.appendChild(li);
 
