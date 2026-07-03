@@ -43,34 +43,36 @@ fetch("data.json")
             <span class="${done ? "text-green-500" : "text-gray-400"} mr-2">${done ? "✔" : "○"}</span>
             <span>${goal.year} &middot; ${goal.text}</span>
           </div>
-          <canvas id="goalProgress-${i}" height="40" class="mt-2"></canvas>
+          ${done ? "" : `<canvas id="goalProgress-${i}" height="40" class="mt-2"></canvas>`}
         `;
         list.appendChild(li);
 
-        new Chart(document.getElementById(`goalProgress-${i}`).getContext("2d"), {
-          type: "bar",
-          data: {
-            labels: [goal.year],
-            datasets: [
-              { label: "Done", data: [achieved], backgroundColor: "#EF4444" },
-              { label: "Remaining", data: [remaining], backgroundColor: "#E5E7EB" },
-            ],
-          },
-          options: {
-            indexAxis: "y",
-            responsive: true,
-            scales: {
-              x: { stacked: true, max: target, display: false },
-              y: { stacked: true, display: false },
-            },
-            plugins: {
-              legend: { display: false },
-              tooltip: { enabled: false },
-              title: { display: false },
-              centerLabel: { text: `${achieved.toFixed(1)} / ${target} km (${percent}%)` },
-            },
-          },
-        });
+        if (!done) {
+            new Chart(document.getElementById(`goalProgress-${i}`).getContext("2d"), {
+              type: "bar",
+              data: {
+                labels: [goal.year],
+                datasets: [
+                  { label: "Done", data: [achieved], backgroundColor: "#EF4444" },
+                  { label: "Remaining", data: [remaining], backgroundColor: "#E5E7EB" },
+                ],
+              },
+              options: {
+                indexAxis: "y",
+                responsive: true,
+                scales: {
+                  x: { stacked: true, max: target, display: false },
+                  y: { stacked: true, display: false },
+                },
+                plugins: {
+                  legend: { display: false },
+                  tooltip: { enabled: false },
+                  title: { display: false },
+                  centerLabel: { text: `${achieved.toFixed(1)} / ${target} km (${percent}%)` },
+                },
+              },
+            });
+        }
       });
     };
 
