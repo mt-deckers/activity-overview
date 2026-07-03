@@ -1,6 +1,71 @@
+const YEARLY_GOALS = [
+  { year: "2024", text: "walk + run 1000km in total", done: true },
+  { year: "2025", text: "walk 1000km", done: true },
+  { year: "2026", text: "run 667 km", progress: { activity: "ran", target: 667 } },
+];
+
 fetch("data.json")
   .then((res) => res.json())
   .then((data) => {
+    const renderGoals = (goals) => {
+      const list = document.getElementById("yearlyGoals");
+
+      goals.forEach((goal, i) => {
+        const achieved = goal.progress
+          ? data["yearly"][goal.progress.activity][goal.year] || 0
+          : null;
+        const done = goal.progress ? achieved >= goal.progress.target : goal.done;
+
+        const li = document.createElement("li");
+        li.className = "bg-white p-3 rounded shadow";
+        li.innerHTML = `
+          <div class="flex items-center">
+            <span class="${done ? "text-green-500" : "text-gray-400"} mr-2">${done ? "✔" : "○"}</span>
+            <span>${goal.year} &middot; ${goal.text}</span>
+          </div>
+          ${goal.progress ? `<canvas id="goalProgress-${i}" height="40" class="mt-2"></canvas>` : ""}
+        `;
+        list.appendChild(li);
+
+        if (goal.progress) {
+          const target = goal.progress.target;
+          const remaining = Math.max(target - achieved, 0);
+          const percent = ((achieved / target) * 100).toFixed(1);
+
+          new Chart(document.getElementById(`goalProgress-${i}`).getContext("2d"), {
+            type: "bar",
+            data: {
+              labels: [goal.year],
+              datasets: [
+                { label: "Done", data: [achieved], backgroundColor: "#EF4444" },
+                { label: "Remaining", data: [remaining], backgroundColor: "#E5E7EB" },
+              ],
+            },
+            options: {
+              indexAxis: "y",
+              responsive: true,
+              scales: {
+                x: { stacked: true, max: target, display: false },
+                y: { stacked: true, display: false },
+              },
+              plugins: {
+                legend: { display: false },
+                tooltip: { enabled: false },
+                title: {
+                  display: true,
+                  align: "start",
+                  font: { size: 12 },
+                  text: `${achieved.toFixed(1)} / ${target} km (${percent}%)`,
+                },
+              },
+            },
+          });
+        }
+      });
+    };
+
+    renderGoals(YEARLY_GOALS);
+
     const createChart = (ctxId, type, datasets, labels = data.labels) => {
       const ctx = document.getElementById(ctxId).getContext("2d");
       new Chart(ctx, {
