@@ -1,8 +1,25 @@
 const YEARLY_GOALS = [
-  { year: "2024", text: "walk + run 1000km in total", done: true },
-  { year: "2025", text: "walk 1000km", done: true },
+  { year: "2024", text: "walk + run 1000km in total", progress: { activity: ["walked", "ran"], target: 1000 } },
+  { year: "2025", text: "walk 1000km", progress: { activity: "walked", target: 1000 } },
   { year: "2026", text: "run 667 km", progress: { activity: "ran", target: 667 } },
 ];
+
+// Chart.js has no built-in way to draw a label inside a bar, so draw it manually
+Chart.register({
+  id: "centerLabel",
+  afterDatasetsDraw(chart) {
+    const text = chart.options.plugins.centerLabel?.text;
+    if (!text) return;
+    const { ctx, chartArea } = chart;
+    ctx.save();
+    ctx.font = "12px sans-serif";
+    ctx.fillStyle = "#111827";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(text, chartArea.left + chartArea.width / 2, (chartArea.top + chartArea.bottom) / 2);
+    ctx.restore();
+  },
+});
 
 fetch("data.json")
   .then((res) => res.json())
@@ -11,10 +28,13 @@ fetch("data.json")
       const list = document.getElementById("yearlyGoals");
 
       goals.forEach((goal, i) => {
-        const achieved = goal.progress
-          ? data["yearly"][goal.progress.activity][goal.year] || 0
-          : null;
-        const done = goal.progress ? achieved >= goal.progress.target : goal.done;
+        const activities = [].concat(goal.progress.activity);
+        const target = goal.progress.target;
+        // sum across multiple activities for combo goals, e.g. walked + ran
+        const achieved = activities.reduce((sum, activity) => sum + (data["yearly"][activity][goal.year] || 0), 0);
+        const remaining = Math.max(target - achieved, 0);
+        const percent = ((achieved / target) * 100).toFixed(1);
+        const done = achieved >= target;
 
         const li = document.createElement("li");
         li.className = "bg-white p-3 rounded shadow";
@@ -23,44 +43,34 @@ fetch("data.json")
             <span class="${done ? "text-green-500" : "text-gray-400"} mr-2">${done ? "✔" : "○"}</span>
             <span>${goal.year} &middot; ${goal.text}</span>
           </div>
-          ${goal.progress ? `<canvas id="goalProgress-${i}" height="40" class="mt-2"></canvas>` : ""}
+          <canvas id="goalProgress-${i}" height="40" class="mt-2"></canvas>
         `;
         list.appendChild(li);
 
-        if (goal.progress) {
-          const target = goal.progress.target;
-          const remaining = Math.max(target - achieved, 0);
-          const percent = ((achieved / target) * 100).toFixed(1);
-
-          new Chart(document.getElementById(`goalProgress-${i}`).getContext("2d"), {
-            type: "bar",
-            data: {
-              labels: [goal.year],
-              datasets: [
-                { label: "Done", data: [achieved], backgroundColor: "#EF4444" },
-                { label: "Remaining", data: [remaining], backgroundColor: "#E5E7EB" },
-              ],
+        new Chart(document.getElementById(`goalProgress-${i}`).getContext("2d"), {
+          type: "bar",
+          data: {
+            labels: [goal.year],
+            datasets: [
+              { label: "Done", data: [achieved], backgroundColor: "#EF4444" },
+              { label: "Remaining", data: [remaining], backgroundColor: "#E5E7EB" },
+            ],
+          },
+          options: {
+            indexAxis: "y",
+            responsive: true,
+            scales: {
+              x: { stacked: true, max: target, display: false },
+              y: { stacked: true, display: false },
             },
-            options: {
-              indexAxis: "y",
-              responsive: true,
-              scales: {
-                x: { stacked: true, max: target, display: false },
-                y: { stacked: true, display: false },
-              },
-              plugins: {
-                legend: { display: false },
-                tooltip: { enabled: false },
-                title: {
-                  display: true,
-                  align: "start",
-                  font: { size: 12 },
-                  text: `${achieved.toFixed(1)} / ${target} km (${percent}%)`,
-                },
-              },
+            plugins: {
+              legend: { display: false },
+              tooltip: { enabled: false },
+              title: { display: false },
+              centerLabel: { text: `${achieved.toFixed(1)} / ${target} km (${percent}%)` },
             },
-          });
-        }
+          },
+        });
       });
     };
 
