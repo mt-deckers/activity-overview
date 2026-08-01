@@ -116,7 +116,7 @@ fetch("data.json")
           tension: 0.3,
         },
         {
-          label: "Swam (km)",
+          label: "Swam (hours)",
           data: data['monthly']['swam'],
           borderColor: "#F59E0B",
           backgroundColor: "rgba(245,158,11,0.1)",
@@ -147,7 +147,7 @@ fetch("data.json")
           backgroundColor: "#10B981",
         },
         {
-          label: "Swam (km)",
+          label: "Swam (hours)",
           data: data['yearly']['swam'],
           backgroundColor: "#F59E0B",
         },
