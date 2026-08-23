@@ -24,7 +24,9 @@ Promise.all([
       const list = document.getElementById("goals");
 
       goals.forEach((goal, i) => {
-        const { activity, target, completed, done: explicitDone } = goal.progress;
+        // no progress object at all means the entry is a plain record, not something to tick off
+        const hasProgress = goal.progress !== undefined;
+        const { activity, target, completed, done: explicitDone } = goal.progress ?? {};
         // a yearly goal derives its value from the activity data; a dated one states it
         const isYearly = activity !== undefined;
         const label = isYearly ? goal.year : goal.date;
@@ -49,12 +51,16 @@ Promise.all([
         const showBar = numeric && !(isYearly && done);
         // a dated goal with no bar prints its result verbatim, met or missed
         const note = !isYearly && !showBar && achieved !== undefined ? achieved : null;
+        // hidden rather than dropped, so the text still lines up with the ticked entries
+        const marker = hasProgress
+          ? `<span class="${done ? "text-green-500" : "text-gray-400"} mr-2">${done ? "✔" : "○"}</span>`
+          : `<span class="invisible mr-2">○</span>`;
 
         const li = document.createElement("li");
         li.className = "bg-white p-3 rounded shadow";
         li.innerHTML = `
           <div class="flex items-center">
-            <span class="${done ? "text-green-500" : "text-gray-400"} mr-2">${done ? "✔" : "○"}</span>
+            ${marker}
             <span>${label} &middot; ${goal.text}</span>
           </div>
           ${showBar ? `<canvas id="goalProgress-${i}" height="10" class="mt-2"></canvas>` : ""}
