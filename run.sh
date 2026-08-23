@@ -33,4 +33,3 @@ EOF
 
 docker build --file Dockerfile.convert -t convert .
 docker run --rm -v $(pwd):/data convert python convert.py
-docker run --rm -v $(pwd):/data convert python convert_calories.py

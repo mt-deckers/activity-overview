@@ -19,52 +19,78 @@ Promise.all([
   fetch("data/data.json").then((res) => res.json()),
   fetch("data/goals.json").then((res) => res.json()),
 ])
-  .then(([data, yearlyGoals]) => {
+  .then(([data, goals]) => {
     const renderGoals = (goals) => {
-      const list = document.getElementById("yearlyGoals");
+      const list = document.getElementById("goals");
 
       goals.forEach((goal, i) => {
-        const activities = [].concat(goal.progress.activity);
-        const target = goal.progress.target;
-        // sum across multiple activities for combo goals, e.g. walked + ran
-        const achieved = activities.reduce((sum, activity) => sum + (data["yearly"][activity][goal.year] || 0), 0);
-        const remaining = Math.max(target - achieved, 0);
-        const percent = ((achieved / target) * 100).toFixed(1);
-        const done = achieved >= target;
+        const { activity, target, completed, done: explicitDone } = goal.progress;
+        // a yearly goal derives its value from the activity data; a dated one states it
+        const isYearly = activity !== undefined;
+        const label = isYearly ? goal.year : goal.date;
+        const unit = goal.unit ?? "km";
+
+        let achieved, done;
+        if (isYearly) {
+          // sum across multiple activities for combo goals, e.g. walked + ran
+          achieved = [].concat(activity).reduce((sum, a) => sum + (data["yearly"][a][goal.year] || 0), 0);
+          done = achieved >= target;
+        } else {
+          achieved = completed;
+          // only comparable numbers can decide this for us; otherwise the file says so
+          done =
+            typeof achieved === "number" && typeof target === "number"
+              ? achieved >= target
+              : explicitDone === true;
+        }
+
+        const numeric = typeof achieved === "number" && typeof target === "number";
+        // a finished yearly goal drops its bar; a dated one keeps it, so >100% stays visible
+        const showBar = numeric && !(isYearly && done);
+        // a dated goal with no bar prints its result verbatim, met or missed
+        const note = !isYearly && !showBar && achieved !== undefined ? achieved : null;
 
         const li = document.createElement("li");
         li.className = "bg-white p-3 rounded shadow";
         li.innerHTML = `
           <div class="flex items-center">
             <span class="${done ? "text-green-500" : "text-gray-400"} mr-2">${done ? "✔" : "○"}</span>
-            <span>${goal.year} &middot; ${goal.text}</span>
+            <span>${label} &middot; ${goal.text}</span>
           </div>
-          ${done ? "" : `<canvas id="goalProgress-${i}" height="10" class="mt-2"></canvas>`}
+          ${showBar ? `<canvas id="goalProgress-${i}" height="10" class="mt-2"></canvas>` : ""}
+          ${note === null ? "" : `<div class="mt-1 text-sm text-gray-600">${note}</div>`}
         `;
         list.appendChild(li);
 
-        if (!done) {
+        if (showBar) {
+          const remaining = Math.max(target - achieved, 0);
+          const percent = ((achieved / target) * 100).toFixed(1);
+          // an over-target bar fills the whole track, in green rather than part-red
+          const over = achieved >= target;
+
             new Chart(document.getElementById(`goalProgress-${i}`).getContext("2d"), {
               type: "bar",
               data: {
-                labels: [goal.year],
-                datasets: [
-                  { label: "Done", data: [achieved], backgroundColor: "#EF4444" },
-                  { label: "Remaining", data: [remaining], backgroundColor: "#E5E7EB" },
-                ],
+                labels: [label],
+                datasets: over
+                  ? [{ label: "Done", data: [achieved], backgroundColor: "#10B981" }]
+                  : [
+                      { label: "Done", data: [achieved], backgroundColor: "#EF4444" },
+                      { label: "Remaining", data: [remaining], backgroundColor: "#E5E7EB" },
+                    ],
               },
               options: {
                 indexAxis: "y",
                 responsive: true,
                 scales: {
-                  x: { stacked: true, max: target, display: false },
+                  x: { stacked: true, max: Math.max(target, achieved), display: false },
                   y: { stacked: true, display: false },
                 },
                 plugins: {
                   legend: { display: false },
                   tooltip: { enabled: false },
                   title: { display: false },
-                  centerLabel: { text: `${achieved.toFixed(1)} / ${target} km (${percent}%)` },
+                  centerLabel: { text: `${achieved.toFixed(1)} / ${target} ${unit} (${percent}%)` },
                 },
               },
             });
@@ -72,7 +98,7 @@ Promise.all([
       });
     };
 
-    renderGoals(yearlyGoals);
+    renderGoals(goals);
 
     const createChart = (ctxId, type, datasets, labels = data.labels) => {
       const ctx = document.getElementById(ctxId).getContext("2d");
