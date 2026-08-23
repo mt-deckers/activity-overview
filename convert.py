@@ -7,7 +7,7 @@ ACTIVITIES = ['walked', 'ran', 'cycled', 'swam']
 
 
 def build_data(yml_data):
-    """Transform the raw data.yml mapping into the chart-ready structure.
+    """Transform the raw data/data.yml mapping into the chart-ready structure.
 
     Swim is carried through as raw hours (no pace/km conversion); the other
     activities are kilometres.
@@ -45,12 +45,12 @@ def build_data(yml_data):
 
 
 def main():
-    with open("data.yml") as f:
+    with open("data/data.yml") as f:
         yml_data = yaml.safe_load(f)
 
     data = build_data(yml_data)
 
-    with open("data.json", "w") as f:
+    with open("data/data.json", "w") as f:
         json.dump(data, f, indent=2)
 
 

@@ -11,7 +11,7 @@
 #  --sheet 2025 --range A1:D12 \
 #  --sheet 2026 --range A1:D12 \
 #  --file /input/reps.ods \
-#  --out /output/data.json
+#  --out /output/data/data.json
 
 cat << EOF
 -----------------------------------------------------

@@ -65,9 +65,9 @@ def test_km_activities_unchanged():
 
 
 def test_real_data_yml_end_to_end():
-    """Run the actual data.yml through the pipeline (the check that used to be a
+    """Run the actual data/data.yml through the pipeline (the check that used to be a
     throwaway one-liner). Swim values are the raw logged hours."""
-    with open(os.path.join(HERE, "data.yml")) as f:
+    with open(os.path.join(HERE, "data", "data.yml")) as f:
         yml = yaml.safe_load(f)
     data = convert.build_data(yml)
 

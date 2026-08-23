@@ -1,9 +1,3 @@
-const YEARLY_GOALS = [
-  { year: "2024", text: "walk + run 1000km in total", progress: { activity: ["walked", "ran"], target: 1000 } },
-  { year: "2025", text: "walk 1000km", progress: { activity: "walked", target: 1000 } },
-  { year: "2026", text: "run 667km", progress: { activity: "ran", target: 667 } },
-];
-
 // Chart.js has no built-in way to draw a label inside a bar, so draw it manually
 Chart.register({
   id: "centerLabel",
@@ -21,9 +15,11 @@ Chart.register({
   },
 });
 
-fetch("data.json")
-  .then((res) => res.json())
-  .then((data) => {
+Promise.all([
+  fetch("data/data.json").then((res) => res.json()),
+  fetch("data/goals.json").then((res) => res.json()),
+])
+  .then(([data, yearlyGoals]) => {
     const renderGoals = (goals) => {
       const list = document.getElementById("yearlyGoals");
 
@@ -76,7 +72,7 @@ fetch("data.json")
       });
     };
 
-    renderGoals(YEARLY_GOALS);
+    renderGoals(yearlyGoals);
 
     const createChart = (ctxId, type, datasets, labels = data.labels) => {
       const ctx = document.getElementById(ctxId).getContext("2d");
