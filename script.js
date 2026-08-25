@@ -30,6 +30,10 @@ Promise.all([
         // a yearly goal derives its value from the activity data; a dated one states it
         const isYearly = activity !== undefined;
         const label = isYearly ? goal.year : goal.date;
+        if (label === undefined) {
+            console.log("Skipping...")
+            return;
+        }
         const unit = goal.unit ?? "km";
 
         let achieved, done;

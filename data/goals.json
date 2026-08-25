@@ -2,7 +2,9 @@
   { "year": "2024", "text": "walk + run 1000km in total", "progress": { "activity": ["walked", "ran"], "target": 1000 } },
   { "year": "2025", "text": "walk 1000km", "progress": { "activity": "walked", "target": 1000 } },
   { "year": "2026", "text": "run 667km", "progress": { "activity": "ran", "target": 667 } },
-  { "date": "30.05.2026", "text": "run 15km", "progress": { "completed": 15.06, "target": 15 } },
-  { "date": "17.07.2026", "text": "distance record: 16.78km" },
-  { "date": "23.08.2026", "text": "run 10km in under an hour", "progress": { "done": true } }
+  { "date": "2026", "text": "run 15km <br><span class=\"text-xs ml-8\">30.05.2026, 15.06km in 01:51:22 (7'24\")</span>", "progress": { "done": true }  },
+  { "date": "2026", "text": "run 10km in under an hour <br><span class=\"text-xs ml-8\">23.08.2026, 10.14km in 00:57:37 (5'41\")</span>", "progress": { "done": true } },
+  { "date": "2027", "text": "run 20km", "progress": { "done": false } },
+  { "date": "2027", "text": "5k in 25min", "progress": { "done": false } },
+  {}
 ]
