@@ -22,6 +22,8 @@ Promise.all([
   .then(([data, goals]) => {
     const renderGoals = (goals) => {
       const list = document.getElementById("goals");
+      // ml-6 clears the ✔/○ column, so a sub-line sits under the title rather than the marker
+      const subLine = "mt-1 ml-6 text-xs text-gray-500";
 
       goals.forEach((goal, i) => {
         // no progress object at all means the entry is a plain record, not something to tick off
@@ -67,8 +69,9 @@ Promise.all([
             ${marker}
             <span>${label} &middot; ${goal.text}</span>
           </div>
+          ${goal.subtext ? `<div class="${subLine}">${goal.subtext}</div>` : ""}
           ${showBar ? `<canvas id="goalProgress-${i}" height="10" class="mt-2"></canvas>` : ""}
-          ${note === null ? "" : `<div class="mt-1 text-sm text-gray-600">${note}</div>`}
+          ${note === null ? "" : `<div class="${subLine}">${note}</div>`}
         `;
         list.appendChild(li);
 
