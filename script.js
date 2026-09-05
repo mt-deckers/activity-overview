@@ -151,7 +151,7 @@ Promise.all([
           tension: 0.3,
         },
         {
-          label: "Swam (hours)",
+          label: "Swam (km)",
           data: data['monthly']['swam'],
           borderColor: "#F59E0B",
           backgroundColor: "rgba(245,158,11,0.1)",
@@ -182,7 +182,7 @@ Promise.all([
           backgroundColor: "#10B981",
         },
         {
-          label: "Swam (hours)",
+          label: "Swam (km)",
           data: data['yearly']['swam'],
           backgroundColor: "#F59E0B",
         },
