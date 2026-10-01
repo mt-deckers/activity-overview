@@ -31,5 +31,5 @@ EOF
 
 #docker run --rm -v $(pwd):/data python:3.12-slim sh -c "pip install pyyaml -q --root-user-action=ignore --disable-pip-version-check && python /data/convert.py"
 
-docker build --file Dockerfile.convert -t convert .
+#docker build --file Dockerfile.convert -t convert .
 docker run --rm -v $(pwd):/data convert python convert.py
